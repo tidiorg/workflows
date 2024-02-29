@@ -1,0 +1,97 @@
+name: Build and Publish Docker
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+
+      container-file:
+        required: true
+        type: string
+        default: dockerfile
+
+      cache-from:
+        required: false
+        type: string
+        default: type=gha
+
+      timeout-minutes:
+        required: true
+        type: number
+        default: 15
+
+      registry:
+        required: true
+        type: string
+        default: ${{ env.CONTAINER_REGISTRY }}
+
+
+  jobs:
+    build-container:
+      name: Build and Publish
+
+      runs-on: ubuntu-latest
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      
+      permissions:
+        contents: read
+        packages: write
+        id-token: write
+
+      concurrency:
+        group: ${{ github.event.repository.full_name }}-${{ matrix.app.name }}
+        cancel-in-progress: false
+
+      env:
+        IMAGE_NAME: ${{ inputs.registry }}/${{ github.event.repository.name }}/${{ inputs.name }}
+        
+        IS_DEFAULT_BRANCH: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+
+      steps:
+        - name: Checkout 🛎️
+          uses: actions/checkout@v4
+
+        - name: Authenticate with Google 🔑
+          id: auth
+          uses: google-github-actions/auth@v2
+          with:
+            token_format: access_token
+            project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
+            workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+            service_account: ${{ secrets.ARTIFACT_SERVICE_ACCOUNT_EMAIL }}
+
+        - name: Authenticate with Docker 🔑
+          uses: docker/login-action@v3
+          with:
+            registry: europe-north1-docker.pkg.dev
+            username: oauth2accesstoken
+            password: ${{ steps.auth.outputs.access_token }}
+
+        - name: Docker meta 🏷
+          id: meta-ghcr
+          uses: docker/metadata-action@v5
+          with:
+            images: ${{ env.IMAGE_NAME }}
+            tags: |
+              type=raw,value=latest,enable=${{ env.IS_DEFAULT_BRANCH }}
+              type=sha,prefix={{branch}}-,priority=1001
+
+        - name: Set up Docker Buildx 🔨
+          id: buildx
+          uses: docker/setup-buildx-action@v3
+
+        - name: Build and Push Container 🛠
+          id: build-and-push
+          uses: docker/build-push-action@v5
+          with:
+            context: ./
+            file: ${{ inputs.container-file }}
+            push: true
+            tags: |
+              ${{ steps.meta-ghcr.outputs.tags }}
+              ${{ steps.meta-gar.outputs.tags }}
+            labels: ${{ steps.meta-ghcr.outputs.labels }}
+            cache-from: ${{ inputs.cache-from }}
+            cache-to: type=gha,mode=max

@@ -8,16 +8,25 @@ workflows that can be referenced in GitHub Action workflows.
 This workflow builds a container image and pushes it to a container registry.
 
 ```yaml
-name: Build and push container image
+name: On Push
+
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: tidiorg/workflows/.github/workflows/build-container@main
+  build-container:
+    name: Build Container
+    permissions:
+      packages: write
+      id-token: write
+      contents: read
+    secrets: inherit
+    
+    uses: tidiorg/workflows/.github/workflows/build-container.yaml@main
+
 ```
 
 To customize the build, you can pass in the following inputs:

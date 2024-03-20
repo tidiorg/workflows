@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: tidiorg/workflows/build-container@main
+    - uses: tidiorg/workflows/.github/workflows/build-container@main
 ```
 
 To customize the build, you can pass in the following inputs:

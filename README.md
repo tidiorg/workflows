@@ -25,7 +25,7 @@ jobs:
       contents: read
     secrets: inherit
     
-    uses: tidiorg/workflows/.github/workflows/build-container.yaml@main
+    uses: tidiorg/workflows/.github/workflows/build-container.yaml@v1
 
 ```
 

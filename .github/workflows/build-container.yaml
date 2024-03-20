@@ -18,6 +18,11 @@ on:
       timeout-minutes:
         type: number
         default: 15
+
+      push-to-registry:
+        type: boolean
+        default: true
+
     secrets:
       GOOGLE_PROJECT_ID:
         required: true
@@ -107,7 +112,7 @@ jobs:
           with:
             context: ./
             file: ${{ inputs.container-file }}
-            push: true
+            push: ${{ inputs.push-to-registry }} 
             tags: |
               ${{ steps.meta-ghcr.outputs.tags }}
               ${{ steps.meta-gar.outputs.tags }}

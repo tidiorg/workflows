@@ -23,12 +23,6 @@ on:
         type: number
         default: 15
 
-      registry:
-        required: true
-        type: string
-        default: ${{ env.CONTAINER_REGISTRY }}
-
-
 jobs:
   build-container:
       name: Build and Publish

@@ -18,12 +18,15 @@ on:
       timeout-minutes:
         type: number
         default: 15
-
-      registry:
+    secrets:
+      GOOGLE_PROJECT_ID:
         required: true
-        type: string
-        default: ${{ secrets.CONTAINER_REGISTRY }}
-
+      WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      ARTIFACT_SERVICE_ACCOUNT_EMAIL:
+        required: true
+      CONTAINER_REGISTRY:
+        required: true
 
 jobs:
   build-container:
@@ -42,7 +45,7 @@ jobs:
         cancel-in-progress: false
 
       env:
-        IMAGE_NAME: ${{ inputs.registry }}/${{ github.event.repository.name }}/${{ inputs.name }}
+        IMAGE_NAME: ${{ secrets.CONTAINER_REGISTRY }}/${{ github.event.repository.name }}/${{ inputs.name }}
         IS_DEFAULT_BRANCH: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 
       outputs:

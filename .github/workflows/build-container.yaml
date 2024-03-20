@@ -29,8 +29,8 @@ on:
         default: ${{ env.CONTAINER_REGISTRY }}
 
 
-  jobs:
-    build-container:
+jobs:
+  build-container:
       name: Build and Publish
 
       runs-on: ubuntu-latest

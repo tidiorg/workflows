@@ -4,22 +4,18 @@ on:
   workflow_call:
     inputs:
       name:
-        required: true
         type: string
         default: ${{ github.event.repository.name }}
 
       container-file:
-        required: true
         type: string
         default: dockerfile
 
       cache-from:
-        required: false
         type: string
         default: type=gha
 
       timeout-minutes:
-        required: true
         type: number
         default: 15
 

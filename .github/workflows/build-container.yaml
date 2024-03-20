@@ -9,7 +9,7 @@ on:
 
       container-file:
         type: string
-        default: dockerfile
+        default: Dockerfile
 
       cache-from:
         type: string

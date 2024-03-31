@@ -33,6 +33,14 @@ on:
       CONTAINER_REGISTRY:
         required: true
 
+    outputs:
+      tag:
+        description: "The output of the tag"
+        value: ${{ jobs.build-container.outputs.tag }}
+      image:
+        description: "The image name"
+        value: ${{ jobs.build-container.outputs.image }}
+
 jobs:
   build-container:
       name: Build and Publish
